@@ -1,12 +1,16 @@
 import gzip
 import pickle
 import numpy as np
+import matplotlib
 from cycler import cycler
 import urllib
 import os
 import sys
 from MulticoreTSNE import MulticoreTSNE as TSNE
 from datetime import datetime
+
+matplotlib.use('ps')
+import matplotlib.pyplot as plt
 
 def log(string):
     sys.stderr.write('[' + str(datetime.now()) + '] ' + str(string) + '\n')
@@ -34,41 +38,34 @@ def get_data(file_name):
       raise ValueError("Shape x does not match shape y "+str(a.shape)+" vs "+str(b.shape))
     return a,b
 
-def export(Y, classes, name):
-   with open(name, 'w') as f:
-     f.write("x y label\n")
-     for y_i in range(0,Y.shape[0]):
-        dim1 = Y[y_i][0]
-        dim2 = Y[y_i][1]
-        label = classes[y_i]
-        f.write(str(dim1)+" "+str(dim2)+" "+str(label)+"\n")
 
-################################################################
+def plot(Y, classes, name):
+    digits = set(classes)
+    fig,ax = plt.subplots()
+    almost_black = '#262626'
+    for x,y,l in Y:
+       color = '#4daf4a'
+       if int(l) == 1: 
+         color = '#e41a1c'
+       ax.scatter(x, y, label=str(1), alpha=0.5, edgecolor=almost_black, facecolor=color, linewidth=0.15)
 
-perp = [400]
-files = ['/tmp/export/Layer3.txt']
-# '/tmp/export/originalData.txt','/tmp/export/Layer0.txt','/tmp/export/Layer1.txt','/tmp/export/Layer2.txt']
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    ax.xaxis.set_ticks_position('none')
+    ax.yaxis.set_ticks_position('none')
+    spines_to_remove = ['top', 'right','bottom','left']
+    for spine in spines_to_remove:
+      ax.spines[spine].set_visible(False)
+    fig.savefig(name,bbox_inches='tight',pad_inches=0,dpi=600)
+
+import glob
+
+files = glob.glob('*.dat')
 for file in files:
- for p in reversed(perp):
-  log("Going to process "+str(file)+" and perplexity = "+str(p))
+  target_name = file[:-3]+'eps'
   data, classes = get_data(file)
-  #data = data[1:3000]
-  #classes = classes[1:3000]
   classes = classes.flatten()
   dims = data.shape[1]
   points = data.shape[0]
   log("File "+str(file)+" has points ="+str(points)+" dims = "+str(dims))
-  log("start TSNE")
-  if dims == 2:
-   data_tsne = data
-  else:
-   tsne = TSNE(n_jobs=4,perplexity=p,n_iter=5000)
-   data_tsne = tsne.fit_transform(data)
-  
-  log("end TSNE")
-  export(data_tsne, classes, 'tsne_'+str(dims)+'D-'+str(p)+'p.dat')
-  data = None
-  data_tsne = None
-  classes = None
-  tsne = None
-  log ('Ready '+str(file)+' and perplexity = '+str(p));
+  plot(data,classes, target_name)
