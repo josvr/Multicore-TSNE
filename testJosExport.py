@@ -1,7 +1,6 @@
 import gzip
 import pickle
 import numpy as np
-from cycler import cycler
 import urllib
 import os
 import sys
