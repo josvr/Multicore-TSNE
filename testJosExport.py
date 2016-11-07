@@ -61,12 +61,13 @@ for file in files:
   log("start TSNE")
   if dims == 2:
    data_tsne = data
+   file_name = 'output_2D.dat'
   else:
    tsne = TSNE(n_jobs=4,perplexity=p,n_iter=5000)
    data_tsne = tsne.fit_transform(data)
-  
+   file_name = 'tsne_'+str(dims)+'D-'+str(p)+'p.dat'
   log("end TSNE")
-  export(data_tsne, classes, 'tsne_'+str(dims)+'D-'+str(p)+'p.dat')
+  export(data_tsne, classes, file_name)
   data = None
   data_tsne = None
   classes = None
