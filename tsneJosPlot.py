@@ -44,7 +44,7 @@ rc('text.latex',preamble=r'\usepackage[variant=b]{fedraserif}')
 p = sns.jointplot(x = nonBotnet['x'],y = nonBotnet['y'],label="Non botnet",marginal_kws=dict(bins=22, rug=False),linewidth=1,edgecolor='black',color=plot1_color,alpha=0.3,stat_func=None)
 
 if is2D:
- p.set_axis_labels("$P$(non botnet)","$P$(botnet)")
+ p.set_axis_labels("$P$(botnet)","$P$(non botnet)")
 else:
  p.set_axis_labels("", "")
 p.x = botnet['x']
